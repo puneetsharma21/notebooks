@@ -1,0 +1,5 @@
+[centos-stream-9-crb]
+name=centos-stream-9-crb
+baseurl=https://mirror.stream.centos.org/9-stream/CRB/ppc64le/os
+enabled=1
+gpgcheck=0
