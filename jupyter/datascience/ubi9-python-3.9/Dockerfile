@@ -18,9 +18,20 @@ COPY Pipfile.lock ./
 # Copy Elyra setup to utils so that it's sourced at startup
 COPY setup-elyra.sh ./utils/
 
+COPY centos-crb.repo /etc/yum.repos.d/centos-crb.repo
+COPY constraints.txt /etc/constraints.txt
+
+USER root
+RUN dnf install -y unixODBC-devel python3-devel openblas* openssl-devel && dnf clean all
+
+USER 1001
+
 RUN echo "Installing softwares and packages" && \
-    micropipenv install && \
-    rm -f ./Pipfile.lock
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &&\
+    source "$HOME/.cargo/env" && \
+    GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true PIP_CONSTRAINT=/etc/constraints.txt micropipenv install && \
+    rm -f ./Pipfile.lock && \
+    rustup self uninstall -y
 
 COPY utils ./utils/
 
@@ -34,16 +45,16 @@ RUN dnf install -y jq unixODBC postgresql git-lfs libsndfile
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 
 # Install MongoDB Client, We need a special repo for MongoDB as they do their own distribution
-COPY mongodb-org-6.0.repo-x86_64 /etc/yum.repos.d/mongodb-org-6.0.repo
+#COPY mongodb-org-6.0.repo-x86_64 /etc/yum.repos.d/mongodb-org-6.0.repo
 
-RUN dnf install -y mongocli
+#RUN dnf install -y mongocli
 
 # Install MSSQL Client, We need a special repo for MSSQL as they do their own distribution
-COPY mssql-2022.repo-x86_64 /etc/yum.repos.d/mssql-2022.repo
+#COPY mssql-2022.repo-x86_64 /etc/yum.repos.d/mssql-2022.repo
 
-RUN ACCEPT_EULA=Y dnf install -y mssql-tools18 unixODBC-devel
+#RUN ACCEPT_EULA=Y dnf install -y mssql-tools18 unixODBC-devel
 
-ENV PATH="$PATH:/opt/mssql-tools18/bin"
+#ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
 # Other apps and tools installed as default user
 USER 1001
