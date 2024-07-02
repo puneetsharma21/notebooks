@@ -148,10 +148,10 @@ runtime-cuda-tensorflow-ubi8-python-3.8: cuda-ubi8-python-3.8
 base-ubi9-python-3.9:
 	$(call image,$@,base/ubi9-python-3.9)
 
-# Example target to build TensorFlow image
+# Build and push jupyter-tensorflow-ubi9-python-3.9 image to the registry
 .PHONY: jupyter-tensorflow-ubi9-python-3.9
 jupyter-tensorflow-ubi9-python-3.9: jupyter-datascience-ubi9-python-3.9
-	$(call image,jupyter-tensorflow-ubi9-python-3.9,jupyter/tensorflow/ubi9-python-3.9,jupyter-datascience-ubi9-python-3.9)
+	$(call image,$@,jupyter/tensorflow/ubi9-python-3.9,$<)
 
 # Build and push jupyter-minimal-ubi9-python-3.9 image to the registry
 .PHONY: jupyter-minimal-ubi9-python-3.9
