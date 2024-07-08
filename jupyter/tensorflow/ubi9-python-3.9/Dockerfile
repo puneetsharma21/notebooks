@@ -30,6 +30,10 @@ RUN echo "Installing softwares and packages" && \
     rm -f ./Pipfile.lock && \
     rustup self uninstall -y
 
+# Switch back to the original user
+USER 1001
+
+
 # Temporary:Workaround for fixing the kfp-kubernetes 1.0.0 for elyra pipeline execution
 # TODO: Remove this patch once the issue is fixed with kfp-kubernetes upgrade.
 RUN patch /opt/app-root/lib/python3.9/site-packages/elyra/templates/kubeflow/v2/python_dsl_template.jinja2 -i utils/python_dsl_template.patch
