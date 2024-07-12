@@ -14,6 +14,9 @@ LABEL name="odh-notebook-jupyter-pytorch-ubi9-python-3.9" \
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY Pipfile.lock ./
 
+# Switch to root user
+USER root
+
 RUN echo "Installing softwares and packages" && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     source "$HOME/.cargo/env" && \
@@ -28,3 +31,6 @@ RUN echo "Installing softwares and packages" && \
 # Fix permissions to support pip in Openshift environments
 RUN chmod -R g+w /opt/app-root/lib/python3.9/site-packages && \
     fix-permissions /opt/app-root -P
+
+# Switch back to non-root user
+USER 1001
