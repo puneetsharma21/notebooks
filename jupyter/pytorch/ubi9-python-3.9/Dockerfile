@@ -11,11 +11,12 @@ LABEL name="odh-notebook-jupyter-pytorch-ubi9-python-3.9" \
     io.openshift.build.source-location="https://github.com/opendatahub-io/notebooks/tree/main/jupyter/pytorch/ubi9-python-3.9" \
     io.openshift.build.image="quay.io/opendatahub/workbench-images:jupyter-pytorch-ubi9-python-3.9"
 
+# Switch to root user
+USER root
+
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY Pipfile.lock ./
 
-# Switch to root user
-USER root
 
 RUN echo "Installing softwares and packages" && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
