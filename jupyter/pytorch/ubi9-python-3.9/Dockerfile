@@ -17,7 +17,6 @@ USER root
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY Pipfile.lock ./
 
-
 RUN echo "Installing softwares and packages" && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     source "$HOME/.cargo/env" && \
