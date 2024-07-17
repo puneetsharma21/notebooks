@@ -14,9 +14,15 @@ LABEL name="odh-notebook-jupyter-pytorch-ubi9-python-3.9" \
 # Install Python packages and Jupyterlab extensions from Pipfile.lock
 COPY Pipfile.lock ./
 
+# Switch to root user
+USER root
+
 RUN echo "Installing softwares and packages" && \
-    micropipenv install && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    source "$HOME/.cargo/env" && \
+    GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true micropipenv install && \
     rm -f ./Pipfile.lock && \
+    rustup self uninstall -y && \
     # Replace Notebook's launcher, "(ipykernel)" with Python's version 3.x.y \
     sed -i -e "s/Python.*/$(python --version | cut -d '.' -f-2)\",/" /opt/app-root/share/jupyter/kernels/python3/kernel.json && \
     # Disable announcement plugin of jupyterlab \
@@ -25,3 +31,6 @@ RUN echo "Installing softwares and packages" && \
 # Fix permissions to support pip in Openshift environments
 RUN chmod -R g+w /opt/app-root/lib/python3.9/site-packages && \
     fix-permissions /opt/app-root -P
+
+# Switch back to non-root user
+USER 1001
