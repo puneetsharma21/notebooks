@@ -1,5 +1,7 @@
 IMAGE_REGISTRY   ?= quay.io/opendatahub/workbench-images
 RELEASE	 		 ?= 2024a
+# additional user-specified caching parameters for $(CONTAINER_ENGINE) build
+CONTAINER_BUILD_CACHE_ARGS ?= --no-cache
 
 # OS dependant: Generate date, select appropriate cmd to locate container engine
 ifeq ($(OS), Windows_NT)
@@ -41,7 +43,7 @@ define build_image
 		$(eval BUILD_ARGS := --build-arg BASE_IMAGE=$(BASE_IMAGE_NAME)),
 		$(eval BUILD_ARGS :=)
 	)
-	$(CONTAINER_ENGINE) build --no-cache  -t $(IMAGE_NAME) $(BUILD_ARGS) $(2)
+	$(CONTAINER_ENGINE) build $(CONTAINER_BUILD_CACHE_ARGS)  -t $(IMAGE_NAME) $(BUILD_ARGS)  $(2)
 endef
 
 # Push function for the notebok image:
@@ -146,6 +148,11 @@ runtime-cuda-tensorflow-ubi8-python-3.8: cuda-ubi8-python-3.8
 base-ubi9-python-3.9:
 	$(call image,$@,base/ubi9-python-3.9)
 
+# Build and push jupyter-tensorflow-ubi9-python-3.9 image to the registry
+.PHONY: jupyter-tensorflow-ubi9-python-3.9
+jupyter-tensorflow-ubi9-python-3.9: jupyter-datascience-ubi9-python-3.9
+	$(call image,$@,jupyter/tensorflow/ubi9-python-3.9,$<)
+
 # Build and push jupyter-minimal-ubi9-python-3.9 image to the registry
 .PHONY: jupyter-minimal-ubi9-python-3.9
 jupyter-minimal-ubi9-python-3.9: base-ubi9-python-3.9
@@ -222,7 +229,7 @@ intel-runtime-tensorflow-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
 
 # Build and push jupyter-intel-tensorflow-ubi9-python-3.9 image to the registry
 .PHONY: jupyter-intel-tensorflow-ubi9-python-3.9
-jupyter-intel-tensorflow-ubi9-python-3.9: intel-runtime-tensorflow-ubi9-python-3.9
+jupyter-intel-tensorflow-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
 	$(call image,$@,jupyter/intel/tensorflow/ubi9-python-3.9,$<)
 
 # Build and push intel-runtime-pytorch-ubi9-python-3.9 image to the registry
@@ -232,7 +239,7 @@ intel-runtime-pytorch-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
 
 # Build and push jupyter-intel-pytorch-ubi9-python-3.9 image to the registry
 .PHONY: jupyter-intel-pytorch-ubi9-python-3.9
-jupyter-intel-pytorch-ubi9-python-3.9: intel-runtime-pytorch-ubi9-python-3.9
+jupyter-intel-pytorch-ubi9-python-3.9: intel-base-gpu-ubi9-python-3.9
 	$(call image,$@,jupyter/intel/pytorch/ubi9-python-3.9,$<)
 
 # Build and push intel-runtime-ml-ubi9-python-3.9 image to the registry
@@ -242,7 +249,7 @@ intel-runtime-ml-ubi9-python-3.9: base-ubi9-python-3.9
 
 # Build and push jupyter-intel-ml-ubi9-python-3.9 image to the registry
 .PHONY: jupyter-intel-ml-ubi9-python-3.9
-jupyter-intel-ml-ubi9-python-3.9: intel-runtime-ml-ubi9-python-3.9
+jupyter-intel-ml-ubi9-python-3.9: base-ubi9-python-3.9
 	$(call image,$@,jupyter/intel/ml/ubi9-python-3.9,$<)
 
 ####################################### Buildchain for Python 3.9 using C9S #######################################
